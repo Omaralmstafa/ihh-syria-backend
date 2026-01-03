@@ -7,7 +7,7 @@ import uuid
 
 media_bp = Blueprint('media', __name__)
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'avi', 'mov', 'wmv', 'pdf'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'avi', 'mov', 'wmv'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -18,8 +18,6 @@ def get_file_type(filename):
         return 'image'
     elif ext in {'mp4', 'avi', 'mov', 'wmv'}:
         return 'video'
-    elif ext == 'pdf':
-        return 'pdf'
     return 'unknown'
 
 @media_bp.route('/upload', methods=['POST'])
@@ -54,10 +52,7 @@ def upload_file():
             # Get file type
             file_type = get_file_type(filename)
             
-            # Get base URL from request
-            from flask import request as flask_request
-            base_url = flask_request.host_url.rstrip('/')
-            file_url = f"{base_url}/api/media/files/{unique_filename}"
+            file_url = f"/api/media/files/{unique_filename}"
             
             return jsonify({
                 'message': 'تم رفع الملف بنجاح',

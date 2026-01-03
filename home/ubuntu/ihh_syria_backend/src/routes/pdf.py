@@ -200,3 +200,4 @@ def generate_user_pdf(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+

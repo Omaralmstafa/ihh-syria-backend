@@ -89,47 +89,19 @@ def update_user(user_id):
         
         data = request.get_json()
         
-        # Update allowed fields - volunteers can update their own profile
+        # Update allowed fields
         if 'full_name' in data:
             user.full_name = data['full_name']
-        if 'gender' in data:
-            user.gender = data['gender']
-        if 'birth_date' in data:
-            from datetime import datetime
-            try:
-                user.birth_date = datetime.strptime(data['birth_date'], '%Y-%m-%d').date()
-            except:
-                pass
         if 'current_residence' in data:
             user.current_residence = data['current_residence']
-        if 'original_country' in data:
-            user.original_country = data['original_country']
         if 'phone_number' in data:
             user.phone_number = data['phone_number']
         if 'university' in data:
             user.university = data['university']
         if 'major' in data:
             user.major = data['major']
-        if 'academic_year' in data:
-            user.academic_year = data['academic_year']
-        if 'previous_organizations' in data:
-            user.previous_organizations = data['previous_organizations']
-        if 'skills' in data:
-            user.skills = data['skills']
-        if 'previous_work' in data:
-            user.previous_work = data['previous_work']
-        if 'currently_working' in data:
-            user.currently_working = data['currently_working']
-        if 'volunteer_organization' in data:
-            user.volunteer_organization = data['volunteer_organization']
-        if 'available_for_volunteering' in data:
-            user.available_for_volunteering = data['available_for_volunteering']
-        if 'team_role' in data:
-            user.team_role = data['team_role']
         if 'department' in data:
             user.department = data['department']
-        if 'profile_image_url' in data:
-            user.profile_image_url = data['profile_image_url']
         
         # Only managers can update role and office
         if current_user.role in ['general_manager', 'office_manager']:
@@ -141,8 +113,6 @@ def update_user(user_id):
                 user.points = data['points']
             if 'rating' in data:
                 user.rating = data['rating']
-            if 'is_active' in data:
-                user.is_active = data['is_active']
         
         db.session.commit()
         
@@ -194,44 +164,6 @@ def search_users():
         
         return jsonify({
             'users': [user.to_dict() for user in users]
-        }), 200
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@user_bp.route('/<int:user_id>/profile-image', methods=['POST'])
-@jwt_required()
-def update_profile_image(user_id):
-    """Update user profile image"""
-    try:
-        current_user_id = get_jwt_identity()
-        current_user = User.query.get(current_user_id)
-        user = User.query.get(user_id)
-        
-        if not user:
-            return jsonify({'error': 'المستخدم غير موجود'}), 404
-        
-        # Check permissions - user can update their own image or managers can update any
-        can_edit = (
-            current_user.id == user.id or
-            current_user.role in ['general_manager', 'office_manager']
-        )
-        
-        if not can_edit:
-            return jsonify({'error': 'ليس لديك صلاحية لتعديل صورة هذا المستخدم'}), 403
-        
-        data = request.get_json()
-        
-        if 'profile_image_url' not in data:
-            return jsonify({'error': 'مسار الصورة مطلوب'}), 400
-        
-        user.profile_image_url = data['profile_image_url']
-        db.session.commit()
-        
-        return jsonify({
-            'message': 'تم تحديث صورة المستخدم بنجاح',
-            'profile_image_url': user.profile_image_url,
-            'user': user.to_dict()
         }), 200
         
     except Exception as e:

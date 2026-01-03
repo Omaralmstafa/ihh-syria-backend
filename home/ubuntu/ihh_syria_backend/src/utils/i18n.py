@@ -87,3 +87,4 @@ def get_translations(lang=None):
     
     return translations.get(lang, translations['ar'])
 
+
